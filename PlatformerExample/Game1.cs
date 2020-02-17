@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System.Linq;
-using PlatformerExample.Collisions;
 
 namespace PlatformerExample
 {
@@ -15,11 +15,13 @@ namespace PlatformerExample
         SpriteBatch spriteBatch;
         SpriteSheet sheet;
         Player player;
+        List<Platform> platforms;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            platforms = new List<Platform>();
         }
 
         /// <summary>
@@ -51,6 +53,8 @@ namespace PlatformerExample
             // Create the player with the corresponding frames from the spritesheet
             var playerFrames = from index in Enumerable.Range(19, 30) select sheet[index];
             player = new Player(playerFrames);
+
+            // Create the platforms
         }
 
         /// <summary>

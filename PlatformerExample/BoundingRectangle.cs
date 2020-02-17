@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
-namespace PlatformerExample.Collisions
+namespace PlatformerExample
 {
     public struct BoundingRectangle
     {

@@ -15,6 +15,17 @@ namespace PlatformerExample
         private Texture2D texture;
 
         /// <summary>
+        /// Gets the sprite's width
+        /// </summary>
+        public int Width => source.Width;
+
+        /// <summary>
+        /// Gets teh sprite's height
+        /// </summary>
+        public int Height => source.Height;
+
+
+        /// <summary>
         /// Constructs a new Sprite
         /// </summary>
         /// <param name="source"></param>

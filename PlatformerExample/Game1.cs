@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Linq;
+using PlatformerExample.Collisions;
 
 namespace PlatformerExample
 {
@@ -14,7 +15,7 @@ namespace PlatformerExample
         SpriteBatch spriteBatch;
         SpriteSheet sheet;
         Player player;
-        
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -92,10 +93,11 @@ namespace PlatformerExample
             player.Draw(spriteBatch);
             
             // Draw an arbitrary range of sprites
-            for(var i = 19; i < 30; i++)
+            for(var i = 17; i < 30; i++)
             {
                 sheet[i].Draw(spriteBatch, new Vector2(i*25, 25), Color.White);
             }
+
 
             spriteBatch.End();
 

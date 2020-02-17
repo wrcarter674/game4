@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PlatformerExample.Collisions;
 
 namespace PlatformerExample
 {
@@ -94,8 +95,7 @@ namespace PlatformerExample
             if(jumping)
             {
                 jumpTimer += gameTime.ElapsedGameTime;
-                // TODO: Replace jumping with platformer physics
-                //Position.Y -= speed; // Naive jumping 
+                // Simple jumping with platformer physics
                 Position.Y -= (250 / (float)jumpTimer.TotalMilliseconds);
                 if(jumpTimer.TotalMilliseconds >= JUMP_TIME)
                 {
@@ -144,33 +144,37 @@ namespace PlatformerExample
                     currentFrame = 0;
                     animationTimer = new TimeSpan(0);
                     break;
+
                 case PlayerAnimState.JumpingLeft:
                     spriteEffects = SpriteEffects.FlipHorizontally;
                     currentFrame = 7;
                     break;
+
                 case PlayerAnimState.JumpingRight:
-                    spriteEffects = SpriteEffects.None;
+                     spriteEffects = SpriteEffects.None;
                     currentFrame = 7;
                     break;
+
                 case PlayerAnimState.WalkingLeft:
                     animationTimer += gameTime.ElapsedGameTime;
                     spriteEffects = SpriteEffects.FlipHorizontally;
                     // Walking frames are 9 & 10
-                    currentFrame = (int)animationTimer.TotalMilliseconds / FRAME_RATE + 9;
                     if(animationTimer.TotalMilliseconds > FRAME_RATE * 2)
                     {
                         animationTimer = new TimeSpan(0);
-                    } 
+                    }
+                    currentFrame = (int)Math.Floor(animationTimer.TotalMilliseconds / FRAME_RATE) + 9;
                     break;
+
                 case PlayerAnimState.WalkingRight:
                     animationTimer += gameTime.ElapsedGameTime;
                     spriteEffects = SpriteEffects.None;
                     // Walking frames are 9 & 10
-                    currentFrame = (int)animationTimer.TotalMilliseconds / FRAME_RATE + 9;
                     if (animationTimer.TotalMilliseconds > FRAME_RATE * 2)
                     {
                         animationTimer = new TimeSpan(0);
                     }
+                    currentFrame = (int)Math.Floor(animationTimer.TotalMilliseconds / FRAME_RATE) + 9;
                     break;
 
             }
@@ -185,5 +189,6 @@ namespace PlatformerExample
         {
             frames[currentFrame].Draw(spriteBatch, Position, color, 0, origin, 2, spriteEffects, 1);
         }
+
     }
 }

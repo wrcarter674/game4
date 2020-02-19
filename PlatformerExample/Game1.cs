@@ -11,11 +11,14 @@ namespace PlatformerExample
     /// </summary>
     public class Game1 : Game
     {
+
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SpriteSheet sheet;
         Player player;
         List<Platform> platforms;
+        AxisList world;
 
         public Game1()
         {
@@ -43,6 +46,9 @@ namespace PlatformerExample
         /// </summary>
         protected override void LoadContent()
         {
+#if VISUAL_DEBUG
+            VisualDebugging.LoadContent(Content);
+#endif
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -55,6 +61,16 @@ namespace PlatformerExample
             player = new Player(playerFrames);
 
             // Create the platforms
+            platforms.Add(new Platform(new BoundingRectangle(80, 300, 105, 21), sheet[1]));
+            platforms.Add(new Platform(new BoundingRectangle(280, 400, 84, 21), sheet[2]));
+            platforms.Add(new Platform(new BoundingRectangle(160, 200, 42, 21), sheet[3]));
+
+            // Add the platforms to the axis list
+            world = new AxisList();
+            foreach (Platform platform in platforms)
+            {
+                world.AddGameObject(platform);
+            }
         }
 
         /// <summary>
@@ -79,6 +95,10 @@ namespace PlatformerExample
             // TODO: Add your update logic here
             player.Update(gameTime);
 
+            // Check for platform collisions
+            var platformQuery = world.QueryRange(player.Bounds.X, player.Bounds.X + player.Bounds.Width);
+            player.CheckForPlatformCollision(platformQuery);
+            
             base.Update(gameTime);
         }
 
@@ -92,6 +112,12 @@ namespace PlatformerExample
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
+
+            // Draw the platforms 
+            platforms.ForEach(platform =>
+            {
+                platform.Draw(spriteBatch);
+            });
 
             // Draw the player
             player.Draw(spriteBatch);

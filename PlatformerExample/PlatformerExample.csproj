@@ -41,15 +41,28 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Visual Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Visual Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;LINUX VISUAL_DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AxisList.cs" />
     <Compile Include="BoundingRectangle.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="IBoundable.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="SpriteSheet.cs" />
+    <Compile Include="VisualDebugging.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

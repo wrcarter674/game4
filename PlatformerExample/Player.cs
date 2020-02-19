@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using PlatformerExample.Collisions;
+using System.Diagnostics;
 
 namespace PlatformerExample
 {
@@ -22,6 +22,16 @@ namespace PlatformerExample
         WalkingRight,
         FallingLeft,
         FallingRight
+    }
+
+    /// <summary>
+    /// An enumeration of possible player veritcal movement states
+    /// </summary>
+    enum VerticalMovementState
+    {
+        OnGround,
+        Jumping,
+        Falling
     }
 
     /// <summary>
@@ -47,11 +57,8 @@ namespace PlatformerExample
         // The player's speed
         int speed = 3;
 
-        // If the player is jumping
-        bool jumping = false;
-
-        // If the player is falling 
-        bool falling = false;
+        // The player's vertical movement state
+        VerticalMovementState verticalState = VerticalMovementState.OnGround;
 
         // A timer for jumping
         TimeSpan jumpTimer;
@@ -73,6 +80,8 @@ namespace PlatformerExample
         /// </summary>
         public Vector2 Position = new Vector2(200, 200);
 
+        public BoundingRectangle Bounds => new BoundingRectangle(Position - 1.8f * origin, 38, 41);
+
         /// <summary>
         /// Constructs a new player
         /// </summary>
@@ -92,43 +101,44 @@ namespace PlatformerExample
             var keyboard = Keyboard.GetState();
 
             // Vertical movement
-            if(jumping)
+            switch(verticalState)
             {
-                jumpTimer += gameTime.ElapsedGameTime;
-                // Simple jumping with platformer physics
-                Position.Y -= (250 / (float)jumpTimer.TotalMilliseconds);
-                if(jumpTimer.TotalMilliseconds >= JUMP_TIME)
-                {
-                    jumping = false;
-                    falling = true;
-                }
+                case VerticalMovementState.OnGround:
+                    if(keyboard.IsKeyDown(Keys.Space))
+                    {
+                        verticalState = VerticalMovementState.Jumping;
+                        jumpTimer = new TimeSpan(0);
+                    }
+                    break;
+                case VerticalMovementState.Jumping:
+                    jumpTimer += gameTime.ElapsedGameTime;
+                    // Simple jumping with platformer physics
+                    Position.Y -= (250 / (float)jumpTimer.TotalMilliseconds);
+                    if (jumpTimer.TotalMilliseconds >= JUMP_TIME) verticalState = VerticalMovementState.Falling;
+                    break;
+                case VerticalMovementState.Falling:
+                    Position.Y += speed;
+                    // TODO: This needs to be replaced with collision logic
+                    if (Position.Y > 500)
+                    {
+                        Position.Y = 500;
+                    }
+                    break;
             }
-            if(falling)
-            {
-                Position.Y += speed;
-                // TODO: This needs to be replaced with collision logic
-                if (Position.Y > 400)
-                {
-                    Position.Y = 400;
-                    falling = false;
-                }
-            }
-            if (!jumping && !falling && keyboard.IsKeyDown(Keys.Space)) 
-            { 
-                jumping = true;
-                jumpTimer = new TimeSpan(0);
-            }
+            
 
             // Horizontal movement
             if (keyboard.IsKeyDown(Keys.Left))
             {
-                if (jumping || falling) animationState = PlayerAnimState.JumpingLeft;
+                if (verticalState == VerticalMovementState.Jumping || verticalState == VerticalMovementState.Falling) 
+                    animationState = PlayerAnimState.JumpingLeft;
                 else animationState = PlayerAnimState.WalkingLeft;
                 Position.X -= speed;
             }
             else if(keyboard.IsKeyDown(Keys.Right))
             {
-                if (jumping || falling) animationState = PlayerAnimState.JumpingRight;
+                if (verticalState == VerticalMovementState.Jumping || verticalState == VerticalMovementState.Falling)
+                    animationState = PlayerAnimState.JumpingRight;
                 else animationState = PlayerAnimState.WalkingRight;
                 Position.X += speed;
             }
@@ -180,6 +190,23 @@ namespace PlatformerExample
             }
         }
 
+        public void CheckForPlatformCollision(IEnumerable<IBoundable> platforms)
+        {
+            Debug.WriteLine($"Checking collisions against {platforms.Count()} platforms");
+            if (verticalState != VerticalMovementState.Jumping)
+            {
+                verticalState = VerticalMovementState.Falling;
+                foreach (Platform platform in platforms)
+                {
+                    if (Bounds.CollidesWith(platform.Bounds))
+                    {
+                        Position.Y = platform.Bounds.Y - 1;
+                        verticalState = VerticalMovementState.OnGround;
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Render the player sprite.  Should be invoked between 
         /// SpriteBatch.Begin() and SpriteBatch.End()
@@ -187,6 +214,9 @@ namespace PlatformerExample
         /// <param name="spriteBatch">The SpriteBatch to use</param>
         public void Draw(SpriteBatch spriteBatch)
         {
+#if VISUAL_DEBUG 
+            VisualDebugging.DrawRectangle(spriteBatch, Bounds, Color.Red);
+#endif
             frames[currentFrame].Draw(spriteBatch, Position, color, 0, origin, 2, spriteEffects, 1);
         }
 

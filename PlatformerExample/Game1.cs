@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace PlatformerExample
 {
@@ -59,7 +60,7 @@ namespace PlatformerExample
             // Create the player with the corresponding frames from the spritesheet
             var playerFrames = from index in Enumerable.Range(19, 30) select sheet[index];
             player = new Player(playerFrames);
-
+            
             // Create the platforms
             platforms.Add(new Platform(new BoundingRectangle(80, 300, 105, 21), sheet[1]));
             platforms.Add(new Platform(new BoundingRectangle(280, 400, 84, 21), sheet[2]));
@@ -110,14 +111,18 @@ namespace PlatformerExample
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
-            spriteBatch.Begin();
+            // Calculate and apply the world/view transform
+            var offset = new Vector2(200, 300) - player.Position;
+            var t = Matrix.CreateTranslation(offset.X, offset.Y, 0);
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null,null, t);
 
             // Draw the platforms 
-            platforms.ForEach(platform =>
-            {
+            var platformQuery = world.QueryRange(player.Position.X - 221, player.Position.X + 400);
+            foreach(Platform platform in platformQuery)
+            {   
                 platform.Draw(spriteBatch);
-            });
+            }
+            Debug.WriteLine($"{platformQuery.Count()} Platforms rendered");
 
             // Draw the player
             player.Draw(spriteBatch);

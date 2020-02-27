@@ -78,7 +78,7 @@ namespace PlatformerExample
         /// <summary>
         /// Gets and sets the position of the player on-screen
         /// </summary>
-        public Vector2 Position = new Vector2(200, 200);
+        public Vector2 Position = new Vector2(218, 480);
 
         public BoundingRectangle Bounds => new BoundingRectangle(Position - 1.8f * origin, 38, 41);
 
@@ -99,9 +99,29 @@ namespace PlatformerExample
         public void Update(GameTime gameTime)
         {
             var keyboard = Keyboard.GetState();
-
+            Debug.WriteLine("Position X: " + Position.X + "Position Y: " + Position.Y);
             // Vertical movement
-            switch(verticalState)
+            if (Position.X <= 21)
+            {
+                Position.X = 21;
+                //Bounds.X = position.X;
+            }
+            if (Position.Y >= 768 - Bounds.Height)
+            {
+                Position.Y = 768 - Bounds.Height;
+                //Bounds.Y = position.Y;
+            }
+            if (Position.X >= 500 - Bounds.Width)
+            {
+                Position.X = 500 - Bounds.Width;
+             //   Bounds.X = 1042 - Bounds.Width;
+            }
+            if (Position.Y <= 0)
+            {
+                Position.Y = 0;
+           //     Bounds.Y = position.Y;
+            }
+            switch (verticalState)
             {
                 case VerticalMovementState.OnGround:
                     if(keyboard.IsKeyDown(Keys.Space))
@@ -133,7 +153,9 @@ namespace PlatformerExample
                 if (verticalState == VerticalMovementState.Jumping || verticalState == VerticalMovementState.Falling) 
                     animationState = PlayerAnimState.JumpingLeft;
                 else animationState = PlayerAnimState.WalkingLeft;
-                Position.X -= speed;
+                
+                    Position.X -= speed;
+                
             }
             else if(keyboard.IsKeyDown(Keys.Right))
             {
@@ -192,7 +214,10 @@ namespace PlatformerExample
 
         public void CheckForPlatformCollision(IEnumerable<IBoundable> platforms)
         {
-            Debug.WriteLine($"Checking collisions against {platforms.Count()} platforms");
+            BoundingRectangle temp = Bounds;
+           // temp.X = temp.X - 10;
+           // temp.Y = temp.Y - 21;
+            //Debug.WriteLine($"Checking collisions against {platforms.Count()} platforms");
             if (verticalState != VerticalMovementState.Jumping)
             {
                 verticalState = VerticalMovementState.Falling;

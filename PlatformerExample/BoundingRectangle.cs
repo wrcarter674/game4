@@ -12,12 +12,12 @@ namespace PlatformerExample
         /// <summary>
         /// The x coordinate of the upper-left corner of the rectangle
         /// </summary>
-        public float X;
+        public float X { get; set; }
 
         /// <summary>
         /// The y cooridnate of the upper-left corner of the rectangle
         /// </summary>
-        public float Y;
+        public float Y { get; set; }
 
         /// <summary>
         /// The width of the rectangle
@@ -88,6 +88,7 @@ namespace PlatformerExample
                 (int)br.Width,
                 (int)br.Height);
         }
+
     }   
 
 }
